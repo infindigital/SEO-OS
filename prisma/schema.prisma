@@ -1,6 +1,5 @@
 // Prisma schema for the Infin Digital SEO OS.
-// Data models are added incrementally as features are built — this file
-// currently defines only the client generator and datasource.
+// Data models are added incrementally as features are built.
 
 generator client {
   provider      = "prisma-client-js"
@@ -11,4 +10,30 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
+}
+
+/// Lifecycle stage of a client engagement.
+enum ClientStatus {
+  PROSPECT
+  ONBOARDING
+  ACTIVE
+  PAUSED
+  CHURNED
+}
+
+/// A client workspace managed within the SEO OS.
+model Client {
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String
+  website      String?
+  contactName  String?      @map("contact_name")
+  contactEmail String?      @map("contact_email")
+  status       ClientStatus @default(PROSPECT)
+  notes        String?
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([name])
+  @@map("clients")
 }
