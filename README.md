@@ -81,6 +81,21 @@ The app runs at http://localhost:3000.
 | `npm run prisma:studio`  | Open Prisma Studio                           |
 | `npm run db:push`        | Push the schema without a migration          |
 
+## SEO crawler
+
+Crawl a site with Playwright and save the result as JSON under `reports/`:
+
+```bash
+export PLAYWRIGHT_CHROMIUM_EXECUTABLE=/path/to/chromium
+npm run crawl -- https://example.com --max-pages=50 --max-depth=2
+```
+
+For each discovered page it collects the status code, response time, title, meta
+description, canonical, meta robots, H1/H2, image and missing-alt counts, word
+count, schema.org types, and internal/external links. `playwright-core` does not
+bundle a browser, so `PLAYWRIGHT_CHROMIUM_EXECUTABLE` must point at a Chromium
+binary. Browser-backed crawler tests run via `npm run test:crawler`.
+
 ## Docker
 
 ```bash
