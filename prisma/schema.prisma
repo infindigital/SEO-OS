@@ -1,0 +1,14 @@
+// Prisma schema for the Infin Digital SEO OS.
+// Data models are added incrementally as features are built — this file
+// currently defines only the client generator and datasource.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
