@@ -12,6 +12,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// A daily snapshot of headline metrics powering the dashboard. One row per
+/// day; populated by analytics/ETL (or the demo seed).
+model DailyMetric {
+  id                String   @id @default(uuid()) @db.Uuid
+  date              DateTime @unique @db.Date
+  organicTraffic    Int      @map("organic_traffic")
+  seoScore          Int      @map("seo_score")
+  openTasks         Int      @map("open_tasks")
+  developerProgress Int      @map("developer_progress")
+  contentProgress   Int      @map("content_progress")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_metrics")
+}
+
 /// Access-control role assigned to a user profile.
 enum UserRole {
   ADMIN

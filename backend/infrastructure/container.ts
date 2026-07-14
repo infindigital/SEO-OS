@@ -7,8 +7,10 @@ import { DeleteClient } from "@backend/application/client/use-cases/delete-clien
 import { ListClients } from "@backend/application/client/use-cases/list-clients";
 import { ListProfiles } from "@backend/application/auth/use-cases/list-profiles";
 import { UpdateUserRole } from "@backend/application/auth/use-cases/update-user-role";
+import { GetDashboardOverview } from "@backend/application/metrics/use-cases/get-dashboard-overview";
 import { PrismaClientRepository } from "./client/prisma-client-repository";
 import { PrismaProfileRepository } from "./auth/prisma-profile-repository";
+import { PrismaMetricsRepository } from "./metrics/prisma-metrics-repository";
 import { CryptoIdGenerator } from "./id/crypto-id-generator";
 
 /**
@@ -36,3 +38,11 @@ export const profileUseCases = {
 } as const;
 
 export type ProfileUseCases = typeof profileUseCases;
+
+const metricsRepository = new PrismaMetricsRepository(prisma);
+
+export const dashboardUseCases = {
+  overview: new GetDashboardOverview(metricsRepository),
+} as const;
+
+export type DashboardUseCases = typeof dashboardUseCases;
