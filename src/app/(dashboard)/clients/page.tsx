@@ -1,5 +1,7 @@
 import { isClientStatus } from "@backend/domain/client/client-status";
+import { STAFF_ROLES } from "@backend/domain/auth/user-role";
 import { clientUseCases } from "@backend/infrastructure/container";
+import { requireRole } from "@/lib/auth/session";
 import { ClientsTable } from "@dashboard/clients/components/clients-table";
 import { ClientsToolbar } from "@dashboard/clients/components/clients-toolbar";
 
@@ -10,6 +12,8 @@ export default async function ClientsPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string }>;
 }) {
+  await requireRole([...STAFF_ROLES]);
+
   const params = await searchParams;
   const search = typeof params.q === "string" ? params.q.trim() : "";
   const status =

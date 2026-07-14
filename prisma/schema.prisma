@@ -12,6 +12,25 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// Access-control role assigned to a user profile.
+enum UserRole {
+  ADMIN
+  DEVELOPER
+  CLIENT
+}
+
+/// Application profile for a Supabase-authenticated user. `id` matches the
+/// Supabase `auth.users` id. Role is the source of truth for authorization.
+model Profile {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  role      UserRole @default(CLIENT)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
 /// Lifecycle stage of a client engagement.
 enum ClientStatus {
   PROSPECT

@@ -12,7 +12,7 @@ export default function HomePage() {
         </p>
       </div>
       <Button asChild size="lg">
-        <Link href="/clients">Open dashboard</Link>
+        <Link href="/dashboard">Open dashboard</Link>
       </Button>
     </main>
   );
