@@ -11,5 +11,6 @@ export interface ClientRepository {
   update(client: Client): Promise<void>;
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Client | null>;
+  findByContactEmail(email: string): Promise<Client | null>;
   list(query: ListClientsQuery): Promise<Client[]>;
 }

@@ -25,6 +25,17 @@ export class InMemoryClientRepository implements ClientRepository {
     return this.store.get(id) ?? null;
   }
 
+  async findByContactEmail(email: string): Promise<Client | null> {
+    const normalized = email.trim().toLowerCase();
+    const matches = [...this.store.values()].filter(
+      (client) =>
+        !client.isArchived &&
+        client.contactEmail?.toLowerCase() === normalized,
+    );
+    matches.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    return matches[0] ?? null;
+  }
+
   async list(query: ListClientsQuery): Promise<Client[]> {
     const search = query.search?.trim().toLowerCase();
 

@@ -46,4 +46,6 @@ export interface SearchConsoleReadRepository {
     limit: number,
   ): Promise<AggregatedRow[]>;
   coverageBreakdown(connectionId: string): Promise<CoverageCount[]>;
+  /** Number of distinct keywords (query rows) tracked for a connection. */
+  keywordCount(connectionId: string): Promise<number>;
 }

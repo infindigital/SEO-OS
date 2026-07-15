@@ -39,6 +39,9 @@ class FakeReadRepository implements SearchConsoleReadRepository {
   async coverageBreakdown(): Promise<CoverageCount[]> {
     return this.opts.coverage ?? [];
   }
+  async keywordCount(): Promise<number> {
+    return (this.opts.rows ?? []).length;
+  }
 }
 
 describe("GetAgencyOverview", () => {

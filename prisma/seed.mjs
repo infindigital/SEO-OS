@@ -52,6 +52,56 @@ async function main() {
   console.log(`Seeded ${DAYS} days of daily metrics.`);
   await seedSearchConsole();
   await seedDeveloperTasks();
+  await seedClientPortal();
+}
+
+async function seedClientPortal() {
+  const client = await prisma.client.findFirst({
+    where: { name: "Acme Digital (demo)" },
+  });
+  if (!client) {
+    return;
+  }
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const daysAgo = (n) => {
+    const date = new Date(today);
+    date.setUTCDate(today.getUTCDate() - n);
+    return date;
+  };
+
+  // Enrich the demo client so the client portal has something to show.
+  await prisma.client.update({
+    where: { id: client.id },
+    data: {
+      seoScore: 78,
+      currentFocus: "Core Web Vitals and content refresh for top landing pages",
+      lastAuditAt: daysAgo(7),
+    },
+  });
+
+  if ((await prisma.clientReport.count({ where: { clientId: client.id } })) === 0) {
+    await prisma.clientReport.createMany({
+      data: [
+        {
+          clientId: client.id,
+          title: "June SEO performance report",
+          period: "June 2026",
+          summary: "Organic clicks up 14% MoM; three priority fixes shipped.",
+          publishedAt: daysAgo(35),
+        },
+        {
+          clientId: client.id,
+          title: "Q2 technical SEO review",
+          period: "Q2 2026",
+          summary: "Full crawl + audit; 9 issues found, 5 resolved.",
+          publishedAt: daysAgo(20),
+        },
+      ],
+    });
+    console.log("Seeded 2 client reports.");
+  }
 }
 
 async function seedDeveloperTasks() {

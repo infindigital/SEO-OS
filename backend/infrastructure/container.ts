@@ -23,7 +23,11 @@ import { MarkTaskComplete } from "@backend/application/developer-task/use-cases/
 import { AddTaskNote } from "@backend/application/developer-task/use-cases/add-task-note";
 import { UploadTaskScreenshot } from "@backend/application/developer-task/use-cases/upload-task-screenshot";
 import { GetDeveloperBoardSummary } from "@backend/application/developer-task/use-cases/get-board-summary";
+import { GetClientPortal } from "@backend/application/client-portal/use-cases/get-client-portal";
+import { PublishClientReport } from "@backend/application/client-portal/use-cases/publish-report";
+import { ResolveClientForEmail } from "@backend/application/client-portal/use-cases/resolve-client-for-email";
 import { PrismaDeveloperTaskRepository } from "./developer-task/prisma-developer-task-repository";
+import { PrismaClientReportRepository } from "./client-report/prisma-client-report-repository";
 import { SupabaseScreenshotStorage } from "./developer-task/supabase-screenshot-storage";
 import { PrismaClientRepository } from "./client/prisma-client-repository";
 import { PrismaProfileRepository } from "./auth/prisma-profile-repository";
@@ -97,6 +101,25 @@ export const dashboardUseCases = {
 } as const;
 
 export type DashboardUseCases = typeof dashboardUseCases;
+
+const clientReportRepository = new PrismaClientReportRepository(prisma);
+
+export const clientPortalUseCases = {
+  getPortal: new GetClientPortal(
+    clientRepository,
+    searchConsoleReadRepository,
+    developerTaskRepository,
+    clientReportRepository,
+  ),
+  publishReport: new PublishClientReport(
+    clientRepository,
+    clientReportRepository,
+    idGenerator,
+  ),
+  resolveForEmail: new ResolveClientForEmail(clientRepository),
+} as const;
+
+export type ClientPortalUseCasesContainer = typeof clientPortalUseCases;
 
 const searchConsoleRepository = new PrismaSearchConsoleRepository(prisma);
 const googleOAuthService = new GoogleOAuthService({

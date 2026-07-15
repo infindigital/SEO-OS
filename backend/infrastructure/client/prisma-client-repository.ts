@@ -42,6 +42,17 @@ export class PrismaClientRepository implements ClientRepository {
     return record ? toDomain(record) : null;
   }
 
+  async findByContactEmail(email: string): Promise<Client | null> {
+    const record = await this.prisma.client.findFirst({
+      where: {
+        contactEmail: { equals: email, mode: "insensitive" },
+        archivedAt: null,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+    return record ? toDomain(record) : null;
+  }
+
   async list(query: ListClientsQuery): Promise<Client[]> {
     const where: Prisma.ClientWhereInput = {};
 

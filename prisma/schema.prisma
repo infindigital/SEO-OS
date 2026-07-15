@@ -84,12 +84,30 @@ model Client {
 
   searchConsoleConnections SearchConsoleConnection[]
   developerTasks           DeveloperTask[]
+  reports                  ClientReport[]
 
   @@index([status])
   @@index([name])
   @@index([ownerId])
   @@index([archivedAt])
+  @@index([contactEmail])
   @@map("clients")
+}
+
+/// A client-facing report/deliverable surfaced on the client portal.
+model ClientReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  clientId    String   @map("client_id") @db.Uuid
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title       String
+  period      String?
+  summary     String?
+  url         String?
+  publishedAt DateTime @default(now()) @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([clientId])
+  @@map("client_reports")
 }
 
 /// Priority of a developer task.

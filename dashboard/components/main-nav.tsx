@@ -4,11 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import {
-  STAFF_ROLES,
-  USER_ROLES,
-  type UserRole,
-} from "@backend/domain/auth/user-role";
+import { STAFF_ROLES, type UserRole } from "@backend/domain/auth/user-role";
 
 interface NavItem {
   href: string;
@@ -17,7 +13,8 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", roles: USER_ROLES },
+  { href: "/dashboard", label: "Dashboard", roles: STAFF_ROLES },
+  { href: "/portal", label: "Portal", roles: ["CLIENT"] },
   { href: "/internal", label: "Internal", roles: STAFF_ROLES },
   { href: "/agency", label: "Agency", roles: STAFF_ROLES },
   { href: "/clients", label: "Clients", roles: STAFF_ROLES },

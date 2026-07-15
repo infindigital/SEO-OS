@@ -95,6 +95,14 @@ export class PrismaSearchConsoleReadRepository
     }));
   }
 
+  async keywordCount(connectionId: string): Promise<number> {
+    const grouped = await this.prisma.searchAnalyticsRow.groupBy({
+      by: ["keyValue"],
+      where: { connectionId, dimension: "QUERY" },
+    });
+    return grouped.length;
+  }
+
   async coverageBreakdown(connectionId: string): Promise<CoverageCount[]> {
     const grouped = await this.prisma.pageCoverage.groupBy({
       by: ["coverageState"],
