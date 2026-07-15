@@ -1,0 +1,74 @@
+name: Weekly SEO Audit
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      config:
+        description: "Path to the scheduled-crawls config"
+        required: false
+        default: "automations/scheduled-crawls.json"
+
+# Allow the job to commit the generated reports back to the repository.
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-seo
+  cancel-in-progress: false
+
+jobs:
+  crawl-and-audit:
+    runs-on: ubuntu-latest
+    env:
+      APP_URL: ${{ secrets.APP_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      # 1. Run crawl → 2. Compare → 3. Generate tasks (audit), per configured site.
+      - name: Run weekly crawl, compare and audit
+        env:
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE: ${{ steps.chrome.outputs.chrome-path }}
+        run: npm run weekly -- "${{ github.event.inputs.config || 'automations/scheduled-crawls.json' }}"
+
+      # 4. Commit the reports (and updated client memory) back to the repo.
+      - name: Commit reports
+        run: |
+          git config user.name "seo-os-bot"
+          git config user.email "bot@infindigital.net"
+          git add -f reports/scheduled clients
+          if git diff --cached --quiet; then
+            echo "No report changes to commit."
+          else
+            git commit -m "chore(reports): weekly SEO crawl $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      # 5. Update the dashboard by refreshing live data (skipped if not configured).
+      - name: Update dashboard
+        if: ${{ env.APP_URL != '' }}
+        run: |
+          curl -fsS -X POST "$APP_URL/api/cron/search-console" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            && echo "Dashboard data refreshed." \
+            || echo "Dashboard refresh failed (non-fatal)."

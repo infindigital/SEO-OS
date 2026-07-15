@@ -20,6 +20,7 @@
     "analyze": "tsx scripts/analyze.ts",
     "audit": "tsx scripts/audit.ts",
     "track": "tsx scripts/track.ts",
+    "weekly": "tsx scripts/weekly.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prisma:generate": "prisma generate",

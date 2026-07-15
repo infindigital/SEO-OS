@@ -1,0 +1,3 @@
+[
+  { "clientId": "acme", "url": "https://acme.example/", "maxPages": 50, "maxDepth": 2 }
+]
