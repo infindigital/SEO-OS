@@ -47,7 +47,8 @@ model Profile {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ownedClients Client[] @relation("ClientOwner")
+  ownedClients   Client[]        @relation("ClientOwner")
+  assignedTasks  DeveloperTask[] @relation("TaskAssignee")
 
   @@map("profiles")
 }
@@ -82,12 +83,83 @@ model Client {
   updatedAt       DateTime     @updatedAt @map("updated_at")
 
   searchConsoleConnections SearchConsoleConnection[]
+  developerTasks           DeveloperTask[]
 
   @@index([status])
   @@index([name])
   @@index([ownerId])
   @@index([archivedAt])
   @@map("clients")
+}
+
+/// Priority of a developer task.
+enum DevTaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+/// Workflow status of a developer task.
+enum DevTaskStatus {
+  OPEN
+  IN_PROGRESS
+  BLOCKED
+  DONE
+}
+
+/// A unit of engineering work tracked on the developer dashboard.
+model DeveloperTask {
+  id          String          @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  priority    DevTaskPriority @default(MEDIUM)
+  status      DevTaskStatus   @default(OPEN)
+  completion  Int             @default(0)
+  dueDate     DateTime?       @map("due_date")
+  assigneeId  String?         @map("assignee_id") @db.Uuid
+  assignee    Profile?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  clientId    String?         @map("client_id") @db.Uuid
+  client      Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  completedAt DateTime?       @map("completed_at")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  notes       DeveloperTaskNote[]
+  screenshots DeveloperTaskScreenshot[]
+
+  @@index([assigneeId])
+  @@index([clientId])
+  @@index([status])
+  @@map("developer_tasks")
+}
+
+/// A timestamped note added to a developer task.
+model DeveloperTaskNote {
+  id        String        @id @default(uuid()) @db.Uuid
+  taskId    String        @map("task_id") @db.Uuid
+  task      DeveloperTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String?       @map("author_id") @db.Uuid
+  body      String
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  @@index([taskId])
+  @@map("developer_task_notes")
+}
+
+/// A screenshot attached to a developer task (stored in object storage).
+model DeveloperTaskScreenshot {
+  id         String        @id @default(uuid()) @db.Uuid
+  taskId     String        @map("task_id") @db.Uuid
+  task       DeveloperTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploaderId String?       @map("uploader_id") @db.Uuid
+  path       String
+  url        String?
+  caption    String?
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  @@index([taskId])
+  @@map("developer_task_screenshots")
 }
 
 enum ConnectionStatus {

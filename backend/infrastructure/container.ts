@@ -16,6 +16,15 @@ import { GetClientDashboard } from "@backend/application/dashboards/use-cases/ge
 import { GetInternalDashboard } from "@backend/application/dashboards/use-cases/get-internal-dashboard";
 import { SyncSearchConsole } from "@backend/application/search-console/use-cases/sync-search-console";
 import { SyncAllSearchConsole } from "@backend/application/search-console/use-cases/sync-all-search-console";
+import { CreateDeveloperTask } from "@backend/application/developer-task/use-cases/create-task";
+import { UpdateDeveloperTask } from "@backend/application/developer-task/use-cases/update-task";
+import { ListDeveloperTasks } from "@backend/application/developer-task/use-cases/list-tasks";
+import { MarkTaskComplete } from "@backend/application/developer-task/use-cases/mark-task-complete";
+import { AddTaskNote } from "@backend/application/developer-task/use-cases/add-task-note";
+import { UploadTaskScreenshot } from "@backend/application/developer-task/use-cases/upload-task-screenshot";
+import { GetDeveloperBoardSummary } from "@backend/application/developer-task/use-cases/get-board-summary";
+import { PrismaDeveloperTaskRepository } from "./developer-task/prisma-developer-task-repository";
+import { SupabaseScreenshotStorage } from "./developer-task/supabase-screenshot-storage";
 import { PrismaClientRepository } from "./client/prisma-client-repository";
 import { PrismaProfileRepository } from "./auth/prisma-profile-repository";
 import { PrismaMetricsRepository } from "./metrics/prisma-metrics-repository";
@@ -53,6 +62,25 @@ export const profileUseCases = {
 } as const;
 
 export type ProfileUseCases = typeof profileUseCases;
+
+const developerTaskRepository = new PrismaDeveloperTaskRepository(prisma);
+const screenshotStorage = new SupabaseScreenshotStorage();
+
+export const developerTaskUseCases = {
+  create: new CreateDeveloperTask(developerTaskRepository, idGenerator),
+  update: new UpdateDeveloperTask(developerTaskRepository),
+  list: new ListDeveloperTasks(developerTaskRepository),
+  markComplete: new MarkTaskComplete(developerTaskRepository),
+  addNote: new AddTaskNote(developerTaskRepository, idGenerator),
+  uploadScreenshot: new UploadTaskScreenshot(
+    developerTaskRepository,
+    screenshotStorage,
+    idGenerator,
+  ),
+  boardSummary: new GetDeveloperBoardSummary(developerTaskRepository),
+} as const;
+
+export type DeveloperTaskUseCasesContainer = typeof developerTaskUseCases;
 
 const metricsRepository = new PrismaMetricsRepository(prisma);
 const searchConsoleReadRepository = new PrismaSearchConsoleReadRepository(prisma);

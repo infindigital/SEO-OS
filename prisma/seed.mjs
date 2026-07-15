@@ -51,6 +51,50 @@ async function main() {
 
   console.log(`Seeded ${DAYS} days of daily metrics.`);
   await seedSearchConsole();
+  await seedDeveloperTasks();
+}
+
+async function seedDeveloperTasks() {
+  if ((await prisma.developerTask.count()) > 0) {
+    console.log("Developer tasks already present; skipping.");
+    return;
+  }
+
+  const client = await prisma.client.findFirst({
+    where: { name: "Acme Digital (demo)" },
+  });
+  const clientId = client?.id ?? null;
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const day = (offset) => {
+    const date = new Date(today);
+    date.setUTCDate(today.getUTCDate() + offset);
+    return date;
+  };
+
+  const tasks = [
+    { title: "Fix 404 pages and broken internal links", priority: "CRITICAL", status: "IN_PROGRESS", completion: 40, dueDate: day(-2) },
+    { title: "Add canonical tags across the blog", priority: "HIGH", status: "OPEN", completion: 0, dueDate: day(5) },
+    { title: "Write meta descriptions for product pages", priority: "MEDIUM", status: "OPEN", completion: 0, dueDate: day(9) },
+    { title: "Compress hero images (Core Web Vitals)", priority: "HIGH", status: "BLOCKED", completion: 20, dueDate: day(3) },
+    { title: "Add alt text to gallery images", priority: "LOW", status: "DONE", completion: 100, dueDate: day(-6) },
+  ];
+
+  for (const task of tasks) {
+    await prisma.developerTask.create({
+      data: {
+        title: task.title,
+        priority: task.priority,
+        status: task.status,
+        completion: task.completion,
+        dueDate: task.dueDate,
+        completedAt: task.status === "DONE" ? day(-5) : null,
+        clientId,
+      },
+    });
+  }
+  console.log(`Seeded ${tasks.length} developer tasks.`);
 }
 
 async function seedSearchConsole() {
