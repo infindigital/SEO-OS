@@ -18,6 +18,12 @@ export class EditClient {
       contactName: input.contactName,
       contactEmail: input.contactEmail,
       status: input.status,
+      ownerId: input.ownerId,
+      industry: input.industry,
+      monthlyRetainer: input.monthlyRetainer,
+      seoScore: input.seoScore,
+      lastAuditAt: input.lastAuditAt,
+      currentFocus: input.currentFocus,
       notes: input.notes,
     });
 

@@ -4,7 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { AddClient } from "@backend/application/client/use-cases/add-client";
 import { EditClient } from "@backend/application/client/use-cases/edit-client";
 import { DeleteClient } from "@backend/application/client/use-cases/delete-client";
+import { ArchiveClient } from "@backend/application/client/use-cases/archive-client";
+import { GetClient } from "@backend/application/client/use-cases/get-client";
 import { ListClients } from "@backend/application/client/use-cases/list-clients";
+import { GetClientPortfolioSummary } from "@backend/application/client/use-cases/get-client-portfolio-summary";
 import { ListProfiles } from "@backend/application/auth/use-cases/list-profiles";
 import { UpdateUserRole } from "@backend/application/auth/use-cases/update-user-role";
 import { GetDashboardOverview } from "@backend/application/metrics/use-cases/get-dashboard-overview";
@@ -33,7 +36,10 @@ export const clientUseCases = {
   add: new AddClient(clientRepository, idGenerator),
   edit: new EditClient(clientRepository),
   delete: new DeleteClient(clientRepository),
+  archive: new ArchiveClient(clientRepository),
+  get: new GetClient(clientRepository),
   list: new ListClients(clientRepository),
+  portfolioSummary: new GetClientPortfolioSummary(clientRepository),
 } as const;
 
 export type ClientUseCases = typeof clientUseCases;

@@ -1,5 +1,8 @@
 import { isClientStatus, type ClientStatus } from "./client-status";
 import {
+  CLIENT_MAX_MONTHLY_RETAINER,
+  CLIENT_MAX_SEO_SCORE,
+  CLIENT_MIN_SEO_SCORE,
   CLIENT_NAME_MAX_LENGTH,
   isValidEmail,
   normalizeWebsiteUrl,
@@ -7,6 +10,8 @@ import {
 import {
   InvalidClientEmailError,
   InvalidClientNameError,
+  InvalidClientRetainerError,
+  InvalidClientSeoScoreError,
   InvalidClientStatusError,
   InvalidClientWebsiteError,
 } from "./client.errors";
@@ -18,7 +23,14 @@ export interface ClientProps {
   contactName: string | null;
   contactEmail: string | null;
   status: ClientStatus;
+  ownerId: string | null;
+  industry: string | null;
+  monthlyRetainer: number | null;
+  seoScore: number | null;
+  lastAuditAt: Date | null;
+  currentFocus: string | null;
   notes: string | null;
+  archivedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,7 +42,14 @@ export interface CreateClientProps {
   contactName?: string | null;
   contactEmail?: string | null;
   status?: ClientStatus;
+  ownerId?: string | null;
+  industry?: string | null;
+  monthlyRetainer?: number | null;
+  seoScore?: number | null;
+  lastAuditAt?: Date | null;
+  currentFocus?: string | null;
   notes?: string | null;
+  archivedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -41,6 +60,12 @@ export interface UpdateClientProps {
   contactName?: string | null;
   contactEmail?: string | null;
   status?: ClientStatus;
+  ownerId?: string | null;
+  industry?: string | null;
+  monthlyRetainer?: number | null;
+  seoScore?: number | null;
+  lastAuditAt?: Date | null;
+  currentFocus?: string | null;
   notes?: string | null;
 }
 
@@ -63,7 +88,14 @@ export class Client {
       contactName: normalizeOptionalText(input.contactName ?? null),
       contactEmail: normalizeEmail(input.contactEmail ?? null),
       status: normalizeStatus(input.status ?? "PROSPECT"),
+      ownerId: normalizeOptionalText(input.ownerId ?? null),
+      industry: normalizeOptionalText(input.industry ?? null),
+      monthlyRetainer: normalizeRetainer(input.monthlyRetainer ?? null),
+      seoScore: normalizeSeoScore(input.seoScore ?? null),
+      lastAuditAt: input.lastAuditAt ?? null,
+      currentFocus: normalizeOptionalText(input.currentFocus ?? null),
       notes: normalizeOptionalText(input.notes ?? null),
+      archivedAt: input.archivedAt ?? null,
       createdAt: now,
       updatedAt: input.updatedAt ?? now,
     });
@@ -94,9 +126,39 @@ export class Client {
     if (changes.status !== undefined) {
       this.props.status = normalizeStatus(changes.status);
     }
+    if (changes.ownerId !== undefined) {
+      this.props.ownerId = normalizeOptionalText(changes.ownerId);
+    }
+    if (changes.industry !== undefined) {
+      this.props.industry = normalizeOptionalText(changes.industry);
+    }
+    if (changes.monthlyRetainer !== undefined) {
+      this.props.monthlyRetainer = normalizeRetainer(changes.monthlyRetainer);
+    }
+    if (changes.seoScore !== undefined) {
+      this.props.seoScore = normalizeSeoScore(changes.seoScore);
+    }
+    if (changes.lastAuditAt !== undefined) {
+      this.props.lastAuditAt = changes.lastAuditAt;
+    }
+    if (changes.currentFocus !== undefined) {
+      this.props.currentFocus = normalizeOptionalText(changes.currentFocus);
+    }
     if (changes.notes !== undefined) {
       this.props.notes = normalizeOptionalText(changes.notes);
     }
+    this.props.updatedAt = new Date();
+  }
+
+  /** Archive (soft-hide) the client, preserving its data and status. */
+  archive(at: Date = new Date()): void {
+    this.props.archivedAt = at;
+    this.props.updatedAt = new Date();
+  }
+
+  /** Restore an archived client. */
+  unarchive(): void {
+    this.props.archivedAt = null;
     this.props.updatedAt = new Date();
   }
 
@@ -124,8 +186,40 @@ export class Client {
     return this.props.status;
   }
 
+  get ownerId(): string | null {
+    return this.props.ownerId;
+  }
+
+  get industry(): string | null {
+    return this.props.industry;
+  }
+
+  get monthlyRetainer(): number | null {
+    return this.props.monthlyRetainer;
+  }
+
+  get seoScore(): number | null {
+    return this.props.seoScore;
+  }
+
+  get lastAuditAt(): Date | null {
+    return this.props.lastAuditAt;
+  }
+
+  get currentFocus(): string | null {
+    return this.props.currentFocus;
+  }
+
   get notes(): string | null {
     return this.props.notes;
+  }
+
+  get archivedAt(): Date | null {
+    return this.props.archivedAt;
+  }
+
+  get isArchived(): boolean {
+    return this.props.archivedAt !== null;
   }
 
   get createdAt(): Date {
@@ -189,6 +283,30 @@ function normalizeEmail(value: string | null): string | null {
 function normalizeStatus(value: ClientStatus): ClientStatus {
   if (!isClientStatus(value)) {
     throw new InvalidClientStatusError(String(value));
+  }
+  return value;
+}
+
+function normalizeRetainer(value: number | null): number | null {
+  if (value === null) {
+    return null;
+  }
+  if (!Number.isInteger(value) || value < 0 || value > CLIENT_MAX_MONTHLY_RETAINER) {
+    throw new InvalidClientRetainerError(value);
+  }
+  return value;
+}
+
+function normalizeSeoScore(value: number | null): number | null {
+  if (value === null) {
+    return null;
+  }
+  if (
+    !Number.isInteger(value) ||
+    value < CLIENT_MIN_SEO_SCORE ||
+    value > CLIENT_MAX_SEO_SCORE
+  ) {
+    throw new InvalidClientSeoScoreError(value);
   }
   return value;
 }

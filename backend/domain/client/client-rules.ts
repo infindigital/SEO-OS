@@ -9,6 +9,14 @@ export const CLIENT_CONTACT_NAME_MAX_LENGTH = 120;
 export const CLIENT_EMAIL_MAX_LENGTH = 320;
 export const CLIENT_WEBSITE_MAX_LENGTH = 2048;
 export const CLIENT_NOTES_MAX_LENGTH = 5000;
+export const CLIENT_INDUSTRY_MAX_LENGTH = 120;
+export const CLIENT_CURRENT_FOCUS_MAX_LENGTH = 500;
+
+/** Upper bound for a monthly retainer, in whole currency units. */
+export const CLIENT_MAX_MONTHLY_RETAINER = 100_000_000;
+/** SEO scores are expressed on a 0–100 scale. */
+export const CLIENT_MIN_SEO_SCORE = 0;
+export const CLIENT_MAX_SEO_SCORE = 100;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

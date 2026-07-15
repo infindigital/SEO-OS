@@ -21,7 +21,14 @@ export class PrismaClientRepository implements ClientRepository {
         contactName: client.contactName,
         contactEmail: client.contactEmail,
         status: client.status,
+        ownerId: client.ownerId,
+        industry: client.industry,
+        monthlyRetainer: client.monthlyRetainer,
+        seoScore: client.seoScore,
+        lastAuditAt: client.lastAuditAt,
+        currentFocus: client.currentFocus,
         notes: client.notes,
+        archivedAt: client.archivedAt,
       },
     });
   }
@@ -38,6 +45,12 @@ export class PrismaClientRepository implements ClientRepository {
   async list(query: ListClientsQuery): Promise<Client[]> {
     const where: Prisma.ClientWhereInput = {};
 
+    if (query.archivedOnly) {
+      where.archivedAt = { not: null };
+    } else if (!query.includeArchived) {
+      where.archivedAt = null;
+    }
+
     if (query.status) {
       where.status = query.status;
     }
@@ -49,6 +62,8 @@ export class PrismaClientRepository implements ClientRepository {
         { website: { contains: search, mode: "insensitive" } },
         { contactName: { contains: search, mode: "insensitive" } },
         { contactEmail: { contains: search, mode: "insensitive" } },
+        { industry: { contains: search, mode: "insensitive" } },
+        { currentFocus: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -68,7 +83,14 @@ export class PrismaClientRepository implements ClientRepository {
       contactName: client.contactName,
       contactEmail: client.contactEmail,
       status: client.status,
+      ownerId: client.ownerId,
+      industry: client.industry,
+      monthlyRetainer: client.monthlyRetainer,
+      seoScore: client.seoScore,
+      lastAuditAt: client.lastAuditAt,
+      currentFocus: client.currentFocus,
       notes: client.notes,
+      archivedAt: client.archivedAt,
       createdAt: client.createdAt,
       updatedAt: client.updatedAt,
     };

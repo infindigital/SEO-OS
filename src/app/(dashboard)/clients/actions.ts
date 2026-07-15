@@ -64,3 +64,19 @@ export async function deleteClientAction(
   }
   return result;
 }
+
+export async function archiveClientAction(
+  id: string,
+  archived: boolean,
+): Promise<ActionResult<ClientView>> {
+  const denied = await ensureStaff();
+  if (denied) {
+    return denied;
+  }
+
+  const result = await controller.archive({ id, archived });
+  if (result.ok) {
+    revalidatePath(CLIENTS_PATH);
+  }
+  return result;
+}

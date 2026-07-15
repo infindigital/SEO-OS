@@ -18,6 +18,12 @@ export class AddClient {
       contactName: input.contactName ?? null,
       contactEmail: input.contactEmail ?? null,
       status: input.status,
+      ownerId: input.ownerId ?? null,
+      industry: input.industry ?? null,
+      monthlyRetainer: input.monthlyRetainer ?? null,
+      seoScore: input.seoScore ?? null,
+      lastAuditAt: input.lastAuditAt ?? null,
+      currentFocus: input.currentFocus ?? null,
       notes: input.notes ?? null,
     });
 

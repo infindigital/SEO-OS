@@ -30,6 +30,12 @@ export class InMemoryClientRepository implements ClientRepository {
 
     return [...this.store.values()]
       .filter((client) => {
+        if (query.archivedOnly && !client.isArchived) {
+          return false;
+        }
+        if (!query.includeArchived && !query.archivedOnly && client.isArchived) {
+          return false;
+        }
         if (query.status && client.status !== query.status) {
           return false;
         }
@@ -39,6 +45,8 @@ export class InMemoryClientRepository implements ClientRepository {
             client.website,
             client.contactName,
             client.contactEmail,
+            client.industry,
+            client.currentFocus,
           ]
             .filter((value): value is string => value !== null)
             .join(" ")

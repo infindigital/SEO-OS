@@ -1,29 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useState, useTransition } from "react";
+import {
+  Archive,
+  ArchiveRestore,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ClientView } from "@backend/application/client/dto";
 
+import { archiveClientAction } from "@/app/(dashboard)/clients/actions";
 import { ClientFormDialog } from "./client-form-dialog";
 import { DeleteClientDialog } from "./delete-client-dialog";
+import type { OwnerOption } from "../types";
 
-export function ClientRowActions({ client }: { client: ClientView }) {
+export function ClientRowActions({
+  client,
+  owners,
+}: {
+  client: ClientView;
+  owners: OwnerOption[];
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function toggleArchive() {
+    const nextArchived = !client.isArchived;
+    startTransition(async () => {
+      const result = await archiveClientAction(client.id, nextArchived);
+      if (result.ok) {
+        toast.success(nextArchived ? "Client archived." : "Client restored.");
+      } else {
+        toast.error(result.error);
+      }
+    });
+  }
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label={`Actions for ${client.name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Actions for ${client.name}`}
+          >
             <MoreHorizontal />
           </Button>
         </DropdownMenuTrigger>
@@ -32,6 +65,20 @@ export function ClientRowActions({ client }: { client: ClientView }) {
             <Pencil />
             Edit
           </DropdownMenuItem>
+          <DropdownMenuItem disabled={isPending} onSelect={toggleArchive}>
+            {client.isArchived ? (
+              <>
+                <ArchiveRestore />
+                Restore
+              </>
+            ) : (
+              <>
+                <Archive />
+                Archive
+              </>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             variant="destructive"
             onSelect={() => setDeleteOpen(true)}
@@ -42,7 +89,12 @@ export function ClientRowActions({ client }: { client: ClientView }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <ClientFormDialog open={editOpen} onOpenChange={setEditOpen} client={client} />
+      <ClientFormDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        client={client}
+        owners={owners}
+      />
       <DeleteClientDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}

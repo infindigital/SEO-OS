@@ -55,4 +55,54 @@ describe("PrismaClientRepository (integration)", () => {
     await repository.delete(client.id);
     expect(await repository.findById(client.id)).toBeNull();
   });
+
+  it("persists portfolio fields and honours archive filters", async () => {
+    const ownerId = ids.generate();
+    const owner = await prisma.profile.create({
+      data: {
+        id: ownerId,
+        email: `owner-${ownerId}@example.com`,
+        role: "DEVELOPER",
+      },
+    });
+
+    const client = Client.create({
+      id: ids.generate(),
+      name: "Portfolio Co",
+      ownerId: owner.id,
+      industry: "Healthcare",
+      monthlyRetainer: 4200,
+      seoScore: 88,
+      lastAuditAt: new Date("2026-05-01T00:00:00.000Z"),
+      currentFocus: "Local SEO",
+    });
+    await repository.create(client);
+
+    const stored = await repository.findById(client.id);
+    expect(stored?.ownerId).toBe(owner.id);
+    expect(stored?.industry).toBe("Healthcare");
+    expect(stored?.monthlyRetainer).toBe(4200);
+    expect(stored?.seoScore).toBe(88);
+    expect(stored?.currentFocus).toBe("Local SEO");
+    expect(stored?.lastAuditAt?.toISOString()).toBe(
+      "2026-05-01T00:00:00.000Z",
+    );
+
+    // Search matches the industry field.
+    expect(await repository.list({ search: "healthcare" })).toHaveLength(1);
+
+    // Archive filtering.
+    client.archive(new Date("2026-06-01T00:00:00.000Z"));
+    await repository.update(client);
+
+    expect(await repository.list({})).toHaveLength(0);
+    expect(await repository.list({ archivedOnly: true })).toHaveLength(1);
+    expect(await repository.list({ includeArchived: true })).toHaveLength(1);
+
+    // Owner FK is nulled when the profile is removed (onDelete: SetNull).
+    await prisma.profile.delete({ where: { id: owner.id } });
+    expect((await repository.findById(client.id))?.ownerId).toBeNull();
+
+    await repository.delete(client.id);
+  });
 });

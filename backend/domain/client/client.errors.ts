@@ -26,3 +26,15 @@ export class InvalidClientStatusError extends DomainError {
     super(`"${value}" is not a valid client status.`);
   }
 }
+
+export class InvalidClientRetainerError extends DomainError {
+  constructor(value: number) {
+    super(`Monthly retainer must be a whole, non-negative amount (got ${value}).`);
+  }
+}
+
+export class InvalidClientSeoScoreError extends DomainError {
+  constructor(value: number) {
+    super(`SEO score must be a whole number between 0 and 100 (got ${value}).`);
+  }
+}
