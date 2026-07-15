@@ -17,6 +17,7 @@
     "test:components": "vitest run --config vitest.components.config.ts",
     "test:crawler": "vitest run --config vitest.crawler.config.ts",
     "crawl": "tsx scripts/crawl.ts",
+    "analyze": "tsx scripts/analyze.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prisma:generate": "prisma generate",

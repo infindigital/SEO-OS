@@ -1,3 +1,5 @@
+import type { CrawledImage } from "../../../domain/crawl/page-audit";
+
 /** Raw SEO data extracted from a page's DOM (before link classification). */
 export interface RawPageData {
   title: string | null;
@@ -20,6 +22,8 @@ export interface FetchResult {
   finalUrl: string;
   statusCode: number | null;
   responseTimeMs: number;
+  redirectChain: string[];
+  images: CrawledImage[];
   data: RawPageData | null;
   error: string | null;
 }

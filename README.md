@@ -96,6 +96,16 @@ count, schema.org types, and internal/external links. `playwright-core` does not
 bundle a browser, so `PLAYWRIGHT_CHROMIUM_EXECUTABLE` must point at a Chromium
 binary. Browser-backed crawler tests run via `npm run test:crawler`.
 
+Analyze a saved crawl for SEO issues (rule-based, no AI) and write a JSON report:
+
+```bash
+npm run analyze -- reports/crawl-example.com-....json --thin-content=250 --large-image-kb=100
+```
+
+It flags HTTP errors (404), redirect chains, duplicate titles/descriptions,
+missing H1s, thin content, broken internal links, missing canonicals, large
+images, and images missing alt text.
+
 ## Docker
 
 ```bash

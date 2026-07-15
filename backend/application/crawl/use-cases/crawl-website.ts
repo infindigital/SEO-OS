@@ -63,6 +63,8 @@ export class CrawlWebsite {
         finalUrl: result.finalUrl,
         statusCode: result.statusCode,
         responseTimeMs: result.responseTimeMs,
+        redirectChain: result.redirectChain,
+        images: result.images,
         title: result.data?.title ?? null,
         metaDescription: result.data?.metaDescription ?? null,
         canonical: result.data?.canonical ?? null,

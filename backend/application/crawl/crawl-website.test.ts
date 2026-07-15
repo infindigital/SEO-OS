@@ -34,6 +34,8 @@ class FakePageFetcher implements PageFetcher {
       finalUrl: url,
       statusCode: data ? 200 : 404,
       responseTimeMs: 5,
+      redirectChain: [],
+      images: [],
       data,
       error: data ? null : "not found",
     };

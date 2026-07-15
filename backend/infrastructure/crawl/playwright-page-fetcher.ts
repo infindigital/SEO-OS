@@ -1,10 +1,11 @@
-import { chromium, type Browser } from "playwright-core";
+import { chromium, type Browser, type Response } from "playwright-core";
 
 import type {
   FetchResult,
   PageFetcher,
   RawPageData,
 } from "../../application/crawl/ports/page-fetcher";
+import type { CrawledImage } from "../../domain/crawl/page-audit";
 
 export interface PlaywrightPageFetcherOptions {
   /** Path to the Chromium executable (required for playwright-core). */
@@ -56,8 +57,25 @@ export class PlaywrightPageFetcher implements PageFetcher {
     const page = await context.newPage();
     const startedAt = Date.now();
 
+    // Record the transfer size of every image resource as it loads.
+    const imageBytes = new Map<string, number | null>();
+    page.on("response", (response) => {
+      try {
+        if (response.request().resourceType() !== "image") {
+          return;
+        }
+        const header = response.headers()["content-length"];
+        const parsed = header ? Number.parseInt(header, 10) : Number.NaN;
+        imageBytes.set(response.url(), Number.isFinite(parsed) ? parsed : null);
+      } catch {
+        // Ignore responses that can no longer be inspected.
+      }
+    });
+
     let statusCode: number | null = null;
     let finalUrl = url;
+    let redirectChain: string[] = [];
+    let images: CrawledImage[] = [];
     let data: RawPageData | null = null;
     let error: string | null = null;
 
@@ -68,6 +86,9 @@ export class PlaywrightPageFetcher implements PageFetcher {
       });
       statusCode = response ? response.status() : null;
       finalUrl = page.url();
+      redirectChain = buildRedirectChain(response);
+      // Give images a brief chance to load so their sizes are captured.
+      await page.waitForLoadState("load", { timeout: 5_000 }).catch(() => {});
       // Passed as an anonymous inline arrow with no named inner functions so
       // bundlers (esbuild/tsx) don't inject helpers (e.g. __name) that would be
       // undefined once the function is serialized into the browser context.
@@ -164,6 +185,10 @@ export class PlaywrightPageFetcher implements PageFetcher {
           text,
         };
       });
+      images = Array.from(imageBytes, ([imageUrl, bytes]) => ({
+        url: imageUrl,
+        bytes,
+      }));
     } catch (caught) {
       error = caught instanceof Error ? caught.message : String(caught);
     } finally {
@@ -175,6 +200,8 @@ export class PlaywrightPageFetcher implements PageFetcher {
       finalUrl,
       statusCode,
       responseTimeMs: Date.now() - startedAt,
+      redirectChain,
+      images,
       data,
       error,
     };
@@ -184,4 +211,15 @@ export class PlaywrightPageFetcher implements PageFetcher {
     await this.browser?.close();
     this.browser = null;
   }
+}
+
+/** Walk a response's redirect history to build the chain of hop URLs. */
+function buildRedirectChain(response: Response | null): string[] {
+  const chain: string[] = [];
+  let redirectedFrom = response?.request().redirectedFrom() ?? null;
+  while (redirectedFrom) {
+    chain.unshift(redirectedFrom.url());
+    redirectedFrom = redirectedFrom.redirectedFrom();
+  }
+  return chain;
 }

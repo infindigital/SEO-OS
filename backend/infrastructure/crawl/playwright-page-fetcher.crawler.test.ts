@@ -58,6 +58,8 @@ describe("PlaywrightPageFetcher (crawler)", () => {
     expect(result.statusCode).toBe(200);
     expect(result.error).toBeNull();
     expect(result.responseTimeMs).toBeGreaterThan(0);
+    expect(result.redirectChain).toEqual([]);
+    expect(Array.isArray(result.images)).toBe(true);
 
     const data = result.data;
     expect(data).not.toBeNull();
