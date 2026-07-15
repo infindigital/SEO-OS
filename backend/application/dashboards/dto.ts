@@ -47,3 +47,51 @@ export interface ClientDashboard {
   topPages: AnalyticsRowView[];
   coverage: CoverageBucket[];
 }
+
+/** Headline counters for the internal (agency operations) dashboard. */
+export interface InternalDashboardCards {
+  totalClients: number;
+  monthlyRevenue: number;
+  openTasks: number;
+  criticalIssues: number;
+  reportsPending: number;
+  activeDevelopers: number;
+  averageSeoScore: number | null;
+}
+
+export interface SeoHealthPoint {
+  date: string;
+  score: number;
+}
+
+export interface ClientGrowthPoint {
+  /** First day of the month, ISO-8601. */
+  month: string;
+  added: number;
+  total: number;
+}
+
+export interface RevenuePoint {
+  date: string;
+  revenue: number;
+}
+
+export interface TaskCompletionPoint {
+  date: string;
+  open: number;
+  completed: number;
+}
+
+export interface InternalDashboard {
+  rangeDays: number;
+  hasData: boolean;
+  cards: InternalDashboardCards;
+  seoHealth: SeoHealthPoint[];
+  clientGrowth: ClientGrowthPoint[];
+  revenue: RevenuePoint[];
+  taskCompletion: TaskCompletionPoint[];
+}
+
+export interface InternalDashboardQuery {
+  days?: number;
+}

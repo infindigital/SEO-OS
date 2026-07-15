@@ -13,6 +13,7 @@ import { UpdateUserRole } from "@backend/application/auth/use-cases/update-user-
 import { GetDashboardOverview } from "@backend/application/metrics/use-cases/get-dashboard-overview";
 import { GetAgencyOverview } from "@backend/application/dashboards/use-cases/get-agency-overview";
 import { GetClientDashboard } from "@backend/application/dashboards/use-cases/get-client-dashboard";
+import { GetInternalDashboard } from "@backend/application/dashboards/use-cases/get-internal-dashboard";
 import { SyncSearchConsole } from "@backend/application/search-console/use-cases/sync-search-console";
 import { SyncAllSearchConsole } from "@backend/application/search-console/use-cases/sync-all-search-console";
 import { PrismaClientRepository } from "./client/prisma-client-repository";
@@ -60,6 +61,11 @@ export const dashboardUseCases = {
   overview: new GetDashboardOverview(metricsRepository),
   agency: new GetAgencyOverview(clientRepository, searchConsoleReadRepository),
   client: new GetClientDashboard(clientRepository, searchConsoleReadRepository),
+  internal: new GetInternalDashboard(
+    metricsRepository,
+    clientRepository,
+    profileRepository,
+  ),
 } as const;
 
 export type DashboardUseCases = typeof dashboardUseCases;

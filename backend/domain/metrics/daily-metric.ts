@@ -8,6 +8,9 @@ export interface DailyMetric {
   organicTraffic: number;
   seoScore: number;
   openTasks: number;
+  completedTasks: number;
+  criticalIssues: number;
+  monthlyRevenue: number;
   developerProgress: number;
   contentProgress: number;
   createdAt: Date;

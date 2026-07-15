@@ -25,26 +25,27 @@ async function main() {
     const organicTraffic = Math.round(1200 + 900 * progress + 180 * weekly + 60 * jitter);
     const seoScore = clamp(Math.round(62 + 20 * progress + 3 * weekly), 0, 100);
     const openTasks = clamp(Math.round(24 - 10 * progress + 3 * Math.sin(i / 3)), 0, 999);
+    const completedTasks = clamp(Math.round(3 + 9 * progress + 2 * weekly), 0, 999);
+    const criticalIssues = clamp(Math.round(9 - 7 * progress + Math.sin(i / 2)), 0, 999);
+    const monthlyRevenue = Math.round(14000 + 11000 * progress + 400 * weekly);
     const developerProgress = clamp(Math.round(35 + 55 * progress), 0, 100);
     const contentProgress = clamp(Math.round(20 + 68 * progress), 0, 100);
 
+    const values = {
+      organicTraffic,
+      seoScore,
+      openTasks,
+      completedTasks,
+      criticalIssues,
+      monthlyRevenue,
+      developerProgress,
+      contentProgress,
+    };
+
     await prisma.dailyMetric.upsert({
       where: { date },
-      update: {
-        organicTraffic,
-        seoScore,
-        openTasks,
-        developerProgress,
-        contentProgress,
-      },
-      create: {
-        date,
-        organicTraffic,
-        seoScore,
-        openTasks,
-        developerProgress,
-        contentProgress,
-      },
+      update: values,
+      create: { date, ...values },
     });
   }
 
