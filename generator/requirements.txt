@@ -1,0 +1,10 @@
+# AI audit generator dependencies.
+#
+# The generator runs on the Python standard library alone — the deterministic
+# knowledge base produces every structured field, and the rule-based narrator
+# writes the executive summary offline.
+#
+# Installing `anthropic` and setting ANTHROPIC_API_KEY upgrades the executive
+# summary to a Claude-written one (model: claude-opus-4-8). It is optional:
+#   pip install -r generator/requirements.txt
+anthropic>=0.69.0

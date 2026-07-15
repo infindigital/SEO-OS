@@ -60,3 +60,5 @@ __pycache__/
 .pytest_cache/
 /crawl.json
 /audit.json
+/technical-audit.md
+/developer-tasks.md

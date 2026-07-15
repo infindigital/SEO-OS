@@ -17,5 +17,21 @@ Two interchangeable analyzers turn a `crawl.json` into a technical SEO audit:
 - **TypeScript** at `backend/*/analysis` (+ `scripts/analyze.ts`) — integrated
   with task generation, comparison, and client memory.
 
+## AI audit generator
+
+`generator/` turns an `audit.json` into two Markdown deliverables:
+`technical-audit.md` and `developer-tasks.md`. Each developer task carries a
+Technical Audit, Business Impact, SEO Impact, Recommended Fix, Priority,
+Estimated Time, and Acceptance Criteria. The structured fields come from a
+curated SEO knowledge base (deterministic); the executive summary is written by
+Claude (`claude-opus-4-8`) when `ANTHROPIC_API_KEY` is set, with a deterministic
+rule-based fallback so it always runs.
+
+```bash
+python3 generator/run_generate.py audit.json --out-dir .
+```
+
+See [`generator/README.md`](../../../generator/README.md).
+
 - **Spec:** [`../../../PROJECT_SPEC.md`](../../../PROJECT_SPEC.md) → "Technical SEO Audit"
-- **Code:** `analyzer/seo_analyzer`, `backend/*/{analysis,audit,comparison,client-memory}`, `scripts/{analyze,audit,track}.ts`
+- **Code:** `analyzer/seo_analyzer`, `generator/seo_audit_gen`, `backend/*/{analysis,audit,comparison,client-memory}`, `scripts/{analyze,audit,track}.ts`
