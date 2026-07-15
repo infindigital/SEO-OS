@@ -1,0 +1,9 @@
+# SEO crawler (Version 1) runtime dependencies.
+# Install into an isolated virtualenv:
+#   python -m venv crawler/.venv
+#   crawler/.venv/bin/pip install -r crawler/requirements.txt
+#   crawler/.venv/bin/playwright install chromium
+crawl4ai==0.9.2
+lxml==6.1.1
+# playwright is pulled in by crawl4ai; pinned here for a reproducible browser.
+playwright==1.61.0
