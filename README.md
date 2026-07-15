@@ -122,6 +122,18 @@ score) and update the client's memory (`clients/<clientId>/memory.json`):
 npm run track -- <clientId> reports/crawl-example.com-....json
 ```
 
+## Google Search Console
+
+Connect a client's Search Console property and store its queries, pages, CTR,
+clicks, impressions, and index coverage.
+
+- **Connect:** send a staff user to `GET /api/search-console/connect?clientId=…&siteUrl=…`;
+  the OAuth callback stores the connection. Requires `GOOGLE_OAUTH_CLIENT_ID`,
+  `GOOGLE_OAUTH_CLIENT_SECRET`, and `GOOGLE_OAUTH_REDIRECT_URI`.
+- **Automatic updates:** a scheduler triggers `POST /api/cron/search-console`
+  (`Authorization: Bearer $CRON_SECRET`) on a schedule — daily at 03:00 UTC
+  (see `automations/search-console-sync.ts`) — to sync all connected properties.
+
 ## Docker
 
 ```bash

@@ -68,7 +68,75 @@ model Client {
   createdAt    DateTime     @default(now()) @map("created_at")
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
+  searchConsoleConnections SearchConsoleConnection[]
+
   @@index([status])
   @@index([name])
   @@map("clients")
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+enum SearchDimension {
+  QUERY
+  PAGE
+}
+
+/// A connected Google Search Console property for a client.
+model SearchConsoleConnection {
+  id           String           @id @default(uuid()) @db.Uuid
+  clientId     String           @map("client_id") @db.Uuid
+  client       Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  siteUrl      String           @map("site_url")
+  refreshToken String?          @map("refresh_token")
+  status       ConnectionStatus @default(CONNECTED)
+  lastSyncedAt DateTime?        @map("last_synced_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  analyticsRows SearchAnalyticsRow[]
+  coverage      PageCoverage[]
+
+  @@unique([clientId, siteUrl])
+  @@map("search_console_connections")
+}
+
+/// A Search Console search-analytics row (per query or page, per day).
+model SearchAnalyticsRow {
+  id           String                  @id @default(uuid()) @db.Uuid
+  connectionId String                  @map("connection_id") @db.Uuid
+  connection   SearchConsoleConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  dimension    SearchDimension
+  keyValue     String                  @map("key_value")
+  date         DateTime                @db.Date
+  clicks       Int
+  impressions  Int
+  ctr          Float
+  position     Float
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+
+  @@unique([connectionId, dimension, keyValue, date])
+  @@index([connectionId, dimension, date])
+  @@map("search_analytics_rows")
+}
+
+/// Index coverage status for a page, from the URL Inspection API.
+model PageCoverage {
+  id            String                  @id @default(uuid()) @db.Uuid
+  connectionId  String                  @map("connection_id") @db.Uuid
+  connection    SearchConsoleConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  page          String
+  coverageState String                  @map("coverage_state")
+  verdict       String
+  lastCrawledAt DateTime?               @map("last_crawled_at")
+  fetchedAt     DateTime                @default(now()) @map("fetched_at")
+  updatedAt     DateTime                @updatedAt @map("updated_at")
+
+  @@unique([connectionId, page])
+  @@map("page_coverage")
 }

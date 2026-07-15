@@ -29,9 +29,10 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except static assets and image files so that the
-     * session is refreshed on every navigable route.
+     * Match all navigable routes so the session is refreshed, but skip static
+     * assets and API routes. API routes handle their own authorization (the
+     * cron endpoint via CRON_SECRET; OAuth routes via requireRole).
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
