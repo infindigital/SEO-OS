@@ -114,6 +114,14 @@ acceptance criteria — saved as both Markdown and JSON:
 npm run audit -- reports/crawl-example.com-....json
 ```
 
+Track progress across crawls for a client: compare a new crawl against the
+client's previous one (new / resolved / remaining issues + an improvement
+score) and update the client's memory (`clients/<clientId>/memory.json`):
+
+```bash
+npm run track -- <clientId> reports/crawl-example.com-....json
+```
+
 ## Docker
 
 ```bash
