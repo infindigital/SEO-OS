@@ -106,6 +106,14 @@ It flags HTTP errors (404), redirect chains, duplicate titles/descriptions,
 missing H1s, thin content, broken internal links, missing canonicals, large
 images, and images missing alt text.
 
+Turn a crawl (or analysis) report into a prioritized technical audit — developer
+tasks with business/SEO impact, recommended fixes, effort estimates and
+acceptance criteria — saved as both Markdown and JSON:
+
+```bash
+npm run audit -- reports/crawl-example.com-....json
+```
+
 ## Docker
 
 ```bash
