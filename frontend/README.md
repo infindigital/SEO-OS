@@ -1,9 +1,14 @@
 # frontend
 
-The shared presentation layer consumed by the Next.js application: the design
-system, reusable UI components, hooks, and client-side utilities.
+Shared presentation layer for the SEO OS: the design system and reusable UI
+consumed by the Next.js App Router (`src/app`) and the dashboard feature modules
+(`dashboard/`).
 
-Routing and server entry points live in `src/app` (App Router). This directory
-holds the framework-agnostic-ish building blocks those routes compose. It is
-imported via the `@frontend/*` path alias and never imports from `backend/`
-internals directly — it talks to the backend through interface adapters.
+- `components/` — shared / design-system components (beyond the shadcn/ui
+  primitives in `src/components/ui`)
+- `hooks/` — reusable client hooks
+- `lib/` — client-side utilities and formatters
+
+Imported via the `@frontend/*` path alias. Presentation talks to the backend
+through interface adapters and server actions — it never imports `backend`
+internals directly.

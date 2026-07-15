@@ -148,3 +148,9 @@ The production image is a multi-stage build emitting Next.js standalone output
 
 Every push to `main` and every pull request runs lint, typecheck, Prisma schema
 validation, and a production build via GitHub Actions (`.github/workflows/ci.yml`).
+
+## Documentation
+
+- [`PROJECT_SPEC.md`](PROJECT_SPEC.md) — full product specification (all modules)
+- [`docs/`](docs/) — architecture, data model, API conventions, and one folder
+  per product module (`docs/modules/`)
