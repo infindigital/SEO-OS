@@ -53,9 +53,10 @@ yarn-error.log*
 # Client memory (runtime per-client state)
 /clients/*/memory.json
 
-# Python crawler (virtualenv, caches, crawl output)
+# Python crawler / analyzer (virtualenv, caches, generated output)
 /crawler/.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 /crawl.json
+/audit.json
