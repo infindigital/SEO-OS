@@ -123,10 +123,18 @@ _SIMPLE_TEXT = {
 }
 
 
-def build_audit(audit: dict, narrator, generated_at: Optional[str] = None) -> GeneratedAudit:
+def build_audit(
+    audit: dict,
+    narrator,
+    generated_at: Optional[str] = None,
+    memory=None,
+) -> GeneratedAudit:
     """Build the generated audit (tasks + executive summary) from an audit dict.
 
-    ``narrator`` must expose ``summary(audit, tasks) -> str``.
+    ``narrator`` must expose ``summary(audit, tasks, memory) -> str``. ``memory``
+    is an optional client-memory object (anything with ``to_context() -> str``);
+    it is loaded before recommendations are generated so guidance is tailored to
+    the client's goals and preferences.
     """
     categories: dict[str, list[dict]] = audit.get("categories", {}) or {}
 
@@ -173,7 +181,7 @@ def build_audit(audit: dict, narrator, generated_at: Optional[str] = None) -> Ge
         "taskCount": len(tasks),
     }
 
-    executive_summary = narrator.summary(audit, tasks)
+    executive_summary = narrator.summary(audit, tasks, memory)
 
     return GeneratedAudit(
         source=audit.get("source", {}) or {},

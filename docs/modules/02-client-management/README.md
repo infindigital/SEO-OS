@@ -23,7 +23,24 @@ recoverable.
 
 All routes are gated to staff (admin/developer).
 
+## Client memory
+
+Every client carries a persistent, human-editable `clients/<id>/memory.md` with
+seven sections: Previous Audits, Previous Reports, Completed Tasks, Developer
+Notes, Meeting Notes, Client Preferences, and Business Goals. Memory is **loaded
+before recommendations are generated** so guidance is tailored to the client's
+goals and preferences and never re-recommends completed work.
+
+```bash
+python3 memory/run_memory.py init acme --host acme.com
+python3 memory/run_memory.py add acme "Business Goals" "Grow organic revenue 30%"
+python3 generator/run_generate.py audit.json --client acme --record-audit
+```
+
+Managed by the `memory/` package (`client_memory`); see
+[`memory/README.md`](../../../memory/README.md).
+
 ## References
 
 - **Spec:** [`../../../PROJECT_SPEC.md`](../../../PROJECT_SPEC.md) → "Client Management"
-- **Code:** `backend/*/client`, `src/app/(dashboard)/clients`, `src/app/api/clients`, `dashboard/clients`
+- **Code:** `backend/*/client`, `src/app/(dashboard)/clients`, `src/app/api/clients`, `dashboard/clients`, `memory/client_memory`

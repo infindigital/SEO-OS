@@ -112,6 +112,43 @@ def test_claude_narrator_falls_back_on_empty_response():
     assert "5 crawled page(s)" in summary
 
 
+# --- Memory integration (duck-typed) ------------------------------------------
+
+
+class FakeMemory:
+    """Minimal client-memory stand-in: what the narrators duck-type against."""
+
+    def __init__(self):
+        self.sections = {"Business Goals": ["Grow organic revenue 30%"]}
+
+    def to_context(self):
+        return "Client memory for acme (acme.com)\nBusiness Goals:\n- Grow organic revenue 30%"
+
+
+def test_claude_narrator_loads_memory_into_prompt():
+    client = FakeClient(reply="Summary aligned to goals.")
+    narrator = ClaudeNarrator(client)
+    narrator.summary(AUDIT, tasks_for(AUDIT), memory=FakeMemory())
+
+    prompt = client.calls[0]["messages"][0]["content"]
+    assert "CLIENT MEMORY" in prompt
+    assert "Grow organic revenue 30%" in prompt
+
+
+def test_rule_based_narrator_references_business_goal():
+    summary = RuleBasedNarrator().summary(AUDIT, tasks_for(AUDIT), memory=FakeMemory())
+    assert "grow organic revenue 30%" in summary.lower()
+
+
+def test_build_audit_threads_memory_to_narrator():
+    from seo_audit_gen import build_audit
+
+    client = FakeClient(reply="ok")
+    build_audit(AUDIT, ClaudeNarrator(client), memory=FakeMemory())
+    prompt = client.calls[0]["messages"][0]["content"]
+    assert "Grow organic revenue 30%" in prompt
+
+
 # --- default_narrator ---------------------------------------------------------
 
 

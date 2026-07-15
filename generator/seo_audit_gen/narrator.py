@@ -21,8 +21,23 @@ CLAUDE_MODEL = "claude-opus-4-8"
 
 
 class Narrator(Protocol):
-    def summary(self, audit: dict, tasks: list) -> str:  # pragma: no cover - protocol
+    def summary(
+        self, audit: dict, tasks: list, memory=None
+    ) -> str:  # pragma: no cover - protocol
         ...
+
+
+def _memory_context(memory) -> str:
+    """Best-effort context string from a client-memory object (duck-typed)."""
+    if memory is None:
+        return ""
+    to_context = getattr(memory, "to_context", None)
+    if callable(to_context):
+        try:
+            return to_context() or ""
+        except Exception:  # noqa: BLE001 — memory must never break narration.
+            return ""
+    return str(memory)
 
 
 def _health_verdict(total_issues: int, errors: int) -> str:
@@ -35,10 +50,20 @@ def _health_verdict(total_issues: int, errors: int) -> str:
     return "The site is in reasonable technical health with some issues to address"
 
 
+def _memory_goal_note(memory) -> str:
+    """A short clause tying recommendations to the client's first business goal."""
+    sections = getattr(memory, "sections", None)
+    if isinstance(sections, dict):
+        goals = sections.get("Business Goals") or []
+        if goals:
+            return f" These recommendations support the client's goal to {goals[0].rstrip('.').lower()}."
+    return ""
+
+
 class RuleBasedNarrator:
     """Deterministic executive summary composed from the audit's counts."""
 
-    def summary(self, audit: dict, tasks: list) -> str:
+    def summary(self, audit: dict, tasks: list, memory=None) -> str:
         summary = audit.get("summary", {}) or {}
         source = audit.get("source", {}) or {}
         by_severity = summary.get("bySeverity", {}) or {}
@@ -56,9 +81,10 @@ class RuleBasedNarrator:
             f"found {total_issues} technical SEO issue(s) "
             f"({errors} error, {warnings} warning, {notices} notice). {verdict}."
         )
+        note = _memory_goal_note(memory)
 
         if not tasks:
-            return lead + " No developer tasks were generated."
+            return (lead + " No developer tasks were generated." + note).strip()
 
         top = tasks[0]
         priorities = ", ".join(
@@ -67,7 +93,7 @@ class RuleBasedNarrator:
         return (
             f"{lead} The work breaks down into {len(tasks)} prioritized task(s); "
             f"the highest-impact item is \"{top.title}\" ({top.priority}). "
-            f"Recommended focus order: {priorities}."
+            f"Recommended focus order: {priorities}.{note}"
         )
 
 
@@ -84,14 +110,14 @@ class ClaudeNarrator:
         self._fallback = fallback or RuleBasedNarrator()
         self._model = model
 
-    def summary(self, audit: dict, tasks: list) -> str:
+    def summary(self, audit: dict, tasks: list, memory=None) -> str:
         try:
-            return self._generate(audit, tasks)
+            return self._generate(audit, tasks, memory)
         except Exception:  # noqa: BLE001 — never fail the audit over narration.
-            return self._fallback.summary(audit, tasks)
+            return self._fallback.summary(audit, tasks, memory)
 
-    def _generate(self, audit: dict, tasks: list) -> str:
-        prompt = _build_prompt(audit, tasks)
+    def _generate(self, audit: dict, tasks: list, memory=None) -> str:
+        prompt = _build_prompt(audit, tasks, memory)
         response = self._client.messages.create(
             model=self._model,
             max_tokens=500,
@@ -99,7 +125,10 @@ class ClaudeNarrator:
                 "You are a senior technical SEO consultant writing the executive "
                 "summary of an audit for an agency client. Be concise, specific, "
                 "and business-focused. Write 3–5 sentences of plain prose — no "
-                "headings, no lists, no preamble."
+                "headings, no lists, no preamble. When client memory is provided, "
+                "tailor the summary to the client's business goals and "
+                "preferences, and do not re-recommend tasks already listed as "
+                "completed."
             ),
             messages=[{"role": "user", "content": prompt}],
         )
@@ -113,10 +142,21 @@ class ClaudeNarrator:
         return text
 
 
-def _build_prompt(audit: dict, tasks: list) -> str:
+def _build_prompt(audit: dict, tasks: list, memory=None) -> str:
     summary = audit.get("summary", {}) or {}
     source = audit.get("source", {}) or {}
-    lines = [
+    lines: list[str] = []
+
+    context = _memory_context(memory)
+    if context:
+        lines += [
+            "=== CLIENT MEMORY (load before recommending) ===",
+            context,
+            "=== END CLIENT MEMORY ===",
+            "",
+        ]
+
+    lines += [
         f"Site: {source.get('host') or source.get('startUrl') or 'unknown'}",
         f"Pages crawled: {summary.get('totalPages', 0)}",
         f"Total issues: {summary.get('totalIssues', 0)}",
