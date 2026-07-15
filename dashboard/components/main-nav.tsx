@@ -18,6 +18,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", roles: USER_ROLES },
+  { href: "/agency", label: "Agency", roles: STAFF_ROLES },
   { href: "/clients", label: "Clients", roles: STAFF_ROLES },
   { href: "/admin", label: "Admin", roles: ["ADMIN"] },
 ];

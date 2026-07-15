@@ -8,11 +8,14 @@ import { ListClients } from "@backend/application/client/use-cases/list-clients"
 import { ListProfiles } from "@backend/application/auth/use-cases/list-profiles";
 import { UpdateUserRole } from "@backend/application/auth/use-cases/update-user-role";
 import { GetDashboardOverview } from "@backend/application/metrics/use-cases/get-dashboard-overview";
+import { GetAgencyOverview } from "@backend/application/dashboards/use-cases/get-agency-overview";
+import { GetClientDashboard } from "@backend/application/dashboards/use-cases/get-client-dashboard";
 import { SyncSearchConsole } from "@backend/application/search-console/use-cases/sync-search-console";
 import { SyncAllSearchConsole } from "@backend/application/search-console/use-cases/sync-all-search-console";
 import { PrismaClientRepository } from "./client/prisma-client-repository";
 import { PrismaProfileRepository } from "./auth/prisma-profile-repository";
 import { PrismaMetricsRepository } from "./metrics/prisma-metrics-repository";
+import { PrismaSearchConsoleReadRepository } from "./dashboards/prisma-search-console-read-repository";
 import { PrismaSearchConsoleRepository } from "./search-console/prisma-search-console-repository";
 import { GoogleOAuthService } from "./search-console/google-oauth";
 import { GoogleSearchConsoleGatewayFactory } from "./search-console/google-search-console-gateway-factory";
@@ -45,9 +48,12 @@ export const profileUseCases = {
 export type ProfileUseCases = typeof profileUseCases;
 
 const metricsRepository = new PrismaMetricsRepository(prisma);
+const searchConsoleReadRepository = new PrismaSearchConsoleReadRepository(prisma);
 
 export const dashboardUseCases = {
   overview: new GetDashboardOverview(metricsRepository),
+  agency: new GetAgencyOverview(clientRepository, searchConsoleReadRepository),
+  client: new GetClientDashboard(clientRepository, searchConsoleReadRepository),
 } as const;
 
 export type DashboardUseCases = typeof dashboardUseCases;

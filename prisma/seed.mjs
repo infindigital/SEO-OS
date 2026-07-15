@@ -49,6 +49,111 @@ async function main() {
   }
 
   console.log(`Seeded ${DAYS} days of daily metrics.`);
+  await seedSearchConsole();
+}
+
+async function seedSearchConsole() {
+  const siteUrl = "https://acme.example/";
+  const clientName = "Acme Digital (demo)";
+
+  const existingClient = await prisma.client.findFirst({
+    where: { name: clientName },
+  });
+  const client =
+    existingClient ??
+    (await prisma.client.create({
+      data: {
+        name: clientName,
+        website: siteUrl,
+        contactEmail: "team@acme.example",
+        status: "ACTIVE",
+      },
+    }));
+
+  const connection = await prisma.searchConsoleConnection.upsert({
+    where: { clientId_siteUrl: { clientId: client.id, siteUrl } },
+    update: { status: "CONNECTED", lastSyncedAt: new Date() },
+    create: {
+      clientId: client.id,
+      siteUrl,
+      status: "CONNECTED",
+      lastSyncedAt: new Date(),
+    },
+  });
+
+  const queries = [
+    "seo tools",
+    "technical seo",
+    "keyword research",
+    "site audit",
+    "backlink checker",
+    "core web vitals",
+  ];
+  const pages = [
+    `${siteUrl}`,
+    `${siteUrl}blog/technical-seo`,
+    `${siteUrl}tools/audit`,
+    `${siteUrl}pricing`,
+    `${siteUrl}blog/core-web-vitals`,
+  ];
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+  const DAYS_OF_DATA = 14;
+
+  for (let d = 0; d < DAYS_OF_DATA; d += 1) {
+    const date = new Date(today);
+    date.setUTCDate(today.getUTCDate() - d - 3);
+
+    for (const [index, query] of queries.entries()) {
+      const impressions = 400 - index * 40 + ((d * 7) % 30);
+      const clicks = Math.round(impressions * (0.08 - index * 0.008));
+      await upsertAnalytics(connection.id, "QUERY", query, date, clicks, impressions, 3 + index * 0.8);
+    }
+    for (const [index, page] of pages.entries()) {
+      const impressions = 500 - index * 60 + ((d * 5) % 25);
+      const clicks = Math.round(impressions * (0.1 - index * 0.01));
+      await upsertAnalytics(connection.id, "PAGE", page, date, clicks, impressions, 2 + index);
+    }
+  }
+
+  const coverage = [
+    { page: pages[0], state: "Submitted and indexed", verdict: "PASS" },
+    { page: pages[1], state: "Submitted and indexed", verdict: "PASS" },
+    { page: pages[2], state: "Crawled - currently not indexed", verdict: "NEUTRAL" },
+    { page: pages[3], state: "Submitted and indexed", verdict: "PASS" },
+    { page: pages[4], state: "Discovered - currently not indexed", verdict: "NEUTRAL" },
+  ];
+  for (const entry of coverage) {
+    await prisma.pageCoverage.upsert({
+      where: { connectionId_page: { connectionId: connection.id, page: entry.page } },
+      update: { coverageState: entry.state, verdict: entry.verdict },
+      create: {
+        connectionId: connection.id,
+        page: entry.page,
+        coverageState: entry.state,
+        verdict: entry.verdict,
+      },
+    });
+  }
+
+  console.log(`Seeded Search Console demo data for "${clientName}".`);
+}
+
+async function upsertAnalytics(connectionId, dimension, key, date, clicks, impressions, position) {
+  const ctr = impressions > 0 ? clicks / impressions : 0;
+  await prisma.searchAnalyticsRow.upsert({
+    where: {
+      connectionId_dimension_keyValue_date: {
+        connectionId,
+        dimension,
+        keyValue: key,
+        date,
+      },
+    },
+    update: { clicks, impressions, ctr, position },
+    create: { connectionId, dimension, keyValue: key, date, clicks, impressions, ctr, position },
+  });
 }
 
 main()

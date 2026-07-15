@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   Table,
   TableBody,
@@ -41,7 +43,12 @@ export function ClientsTable({ clients }: { clients: ClientView[] }) {
             clients.map((client) => (
               <TableRow key={client.id}>
                 <TableCell>
-                  <div className="font-medium">{client.name}</div>
+                  <Link
+                    href={`/clients/${client.id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {client.name}
+                  </Link>
                   {client.website && (
                     <a
                       href={client.website}

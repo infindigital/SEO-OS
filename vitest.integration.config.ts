@@ -10,5 +10,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["backend/**/*.integration.ts"],
+    // These tests share one database and reset tables, so run them serially.
+    fileParallelism: false,
   },
 });
