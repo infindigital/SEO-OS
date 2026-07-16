@@ -151,6 +151,13 @@ validation, and a production build via GitHub Actions (`.github/workflows/ci.yml
 
 ## Documentation
 
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — system architecture: clean-architecture
+  layers, the web layer, and the Python pipelines
+- [`API_DOCUMENTATION.md`](API_DOCUMENTATION.md) — REST API routes and server
+  actions
+- [`DATABASE_SCHEMA.md`](DATABASE_SCHEMA.md) — models, enums, relations, indexes
+- [`DEPLOYMENT.md`](DEPLOYMENT.md) — environment, migrations, build, and the
+  production readiness checklist
 - [`PROJECT_SPEC.md`](PROJECT_SPEC.md) — full product specification (all modules)
 - [`docs/`](docs/) — architecture, data model, API conventions, and one folder
   per product module (`docs/modules/`)

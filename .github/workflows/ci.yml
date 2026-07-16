@@ -56,3 +56,70 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  integration:
+    name: Integration tests (PostgreSQL)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: seo_os
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/seo_os
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/seo_os
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply migrations
+        run: npm run prisma:deploy
+
+      - name: Integration tests
+        run: npx vitest run --config vitest.integration.config.ts
+
+  python:
+    name: Python pipeline tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependencies
+        # Pure-Python pipelines: only pytest and fpdf2 (for reporting) are
+        # needed. The crawler suite (Crawl4AI/Playwright) is exercised separately.
+        run: pip install pytest fpdf2==2.8.1
+
+      - name: Run pipeline tests
+        run: |
+          python -m pytest \
+            analyzer/tests generator/tests memory/tests \
+            searchconsole/tests ga4/tests reporting/tests agents/tests
