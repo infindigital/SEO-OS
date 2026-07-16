@@ -55,6 +55,7 @@ yarn-error.log*
 
 # Python crawler / analyzer (virtualenv, caches, generated output)
 /crawler/.venv/
+/searchconsole/.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -62,3 +63,4 @@ __pycache__/
 /audit.json
 /technical-audit.md
 /developer-tasks.md
+/search-console.json

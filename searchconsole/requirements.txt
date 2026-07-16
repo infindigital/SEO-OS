@@ -1,0 +1,11 @@
+# Google Search Console sync — dependencies for LIVE runs only.
+#
+# The package, its tests, and offline `--sample` runs need no third-party
+# packages (standard library only). These are required solely for pulling real
+# data from the Search Console API with a service account.
+#
+# Install into an isolated virtualenv:
+#   python -m venv searchconsole/.venv
+#   searchconsole/.venv/bin/pip install -r searchconsole/requirements.txt
+google-api-python-client==2.156.0
+google-auth==2.37.0

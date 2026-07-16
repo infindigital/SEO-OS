@@ -1,0 +1,79 @@
+name: Search Console Sync
+
+on:
+  schedule:
+    # Daily at 05:00 UTC (Search Console data lags a few days; --lag handles it).
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Search Console property (URL-prefix or sc-domain:)"
+        required: false
+        default: ""
+      days:
+        description: "Reporting window length in days"
+        required: false
+        default: "28"
+
+# Allow the job to commit the refreshed snapshot back to the repository.
+permissions:
+  contents: write
+
+concurrency:
+  group: search-console-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      # Property to sync: dispatch input wins, else the GSC_SITE repo/org variable.
+      GSC_SITE: ${{ github.event.inputs.site || vars.GSC_SITE }}
+      GSC_DAYS: ${{ github.event.inputs.days || '28' }}
+      # Service-account JSON key (a repository/organization secret). When empty,
+      # the job falls back to an offline --sample snapshot so it never fails hard.
+      GSC_CREDENTIALS_JSON: ${{ secrets.GSC_CREDENTIALS_JSON }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r searchconsole/requirements.txt
+
+      - name: Sync Search Console
+        run: |
+          set -euo pipefail
+          mkdir -p reports/search-console
+
+          site="${GSC_SITE:-https://example.com/}"
+          out="reports/search-console/search-console.json"
+
+          if [ -n "${GSC_CREDENTIALS_JSON:-}" ] && [ -n "${GSC_SITE:-}" ]; then
+            printf '%s' "$GSC_CREDENTIALS_JSON" > "$RUNNER_TEMP/gsc-credentials.json"
+            python searchconsole/run_sync.py "$site" \
+              --credentials "$RUNNER_TEMP/gsc-credentials.json" \
+              --days "$GSC_DAYS" \
+              --out "$out"
+            rm -f "$RUNNER_TEMP/gsc-credentials.json"
+          else
+            echo "GSC_SITE/GSC_CREDENTIALS_JSON not configured — writing an offline sample snapshot."
+            python searchconsole/run_sync.py "$site" --sample --days "$GSC_DAYS" --out "$out"
+          fi
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "seo-os-bot"
+          git config user.email "bot@infindigital.net"
+          git add -f reports/search-console
+          if git diff --cached --quiet; then
+            echo "No Search Console changes to commit."
+          else
+            git commit -m "chore(search-console): sync $(date -u +%Y-%m-%d)"
+            git push
+          fi
