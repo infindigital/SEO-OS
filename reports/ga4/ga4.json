@@ -1,0 +1,73 @@
+{
+  "property": "properties/123456789",
+  "range": {
+    "startDate": "2026-06-18",
+    "endDate": "2026-07-15"
+  },
+  "generatedAt": "2026-07-16T07:36:03+00:00",
+  "totals": {
+    "users": 8421,
+    "sessions": 11200,
+    "conversions": 342,
+    "events": 53100
+  },
+  "topPages": [
+    {
+      "page": "/",
+      "views": 9800,
+      "users": 5400,
+      "sessions": 6200
+    },
+    {
+      "page": "/blog/seo-audit",
+      "views": 4300,
+      "users": 3100,
+      "sessions": 3500
+    },
+    {
+      "page": "/pricing",
+      "views": 3100,
+      "users": 2400,
+      "sessions": 2600
+    },
+    {
+      "page": "/tools/checklist",
+      "views": 2050,
+      "users": 1500,
+      "sessions": 1650
+    },
+    {
+      "page": "/contact",
+      "views": 1200,
+      "users": 980,
+      "sessions": 1010
+    }
+  ],
+  "events": [
+    {
+      "event": "page_view",
+      "count": 24800,
+      "users": 8200
+    },
+    {
+      "event": "session_start",
+      "count": 11200,
+      "users": 8100
+    },
+    {
+      "event": "scroll",
+      "count": 9400,
+      "users": 6100
+    },
+    {
+      "event": "form_submit",
+      "count": 640,
+      "users": 520
+    },
+    {
+      "event": "purchase",
+      "count": 342,
+      "users": 300
+    }
+  ]
+}
