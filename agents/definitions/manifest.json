@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "sectionOrder": ["Role", "Responsibilities", "Rules", "SOP", "Output Format"],
+  "agents": [
+    {
+      "id": "seo-director",
+      "name": "SEO Director",
+      "role": "Owns the client's SEO strategy and orchestrates the specialist agents.",
+      "definition": "seo-director.md",
+      "reasoning": "high",
+      "orchestrator": true,
+      "collaboratesWith": [
+        "technical-seo",
+        "content-strategist",
+        "local-seo",
+        "link-building",
+        "reporting",
+        "qa",
+        "developer-reviewer"
+      ],
+      "consumes": ["memory.md", "audit.json", "search-console.json", "ga4.json"],
+      "produces": ["strategy-brief.md", "roadmap"]
+    },
+    {
+      "id": "technical-seo",
+      "name": "Technical SEO",
+      "role": "Finds and specifies technical fixes for crawling, indexing, and page experience.",
+      "definition": "technical-seo.md",
+      "reasoning": "high",
+      "orchestrator": false,
+      "collaboratesWith": ["developer-reviewer", "qa", "reporting"],
+      "consumes": ["crawl.json", "audit.json", "memory.md"],
+      "produces": ["technical-audit.md", "developer-tasks.md"]
+    },
+    {
+      "id": "content-strategist",
+      "name": "Content Strategist",
+      "role": "Turns search-demand data into a prioritized content plan and briefs.",
+      "definition": "content-strategist.md",
+      "reasoning": "high",
+      "orchestrator": false,
+      "collaboratesWith": ["technical-seo", "link-building", "qa", "reporting"],
+      "consumes": ["search-console.json", "memory.md"],
+      "produces": ["content-plan.md", "content-briefs"]
+    },
+    {
+      "id": "local-seo",
+      "name": "Local SEO",
+      "role": "Grows local-pack and map visibility via profile, citation, and review optimization.",
+      "definition": "local-seo.md",
+      "reasoning": "standard",
+      "orchestrator": false,
+      "collaboratesWith": ["content-strategist", "technical-seo", "reporting"],
+      "consumes": ["crawl.json", "memory.md"],
+      "produces": ["local-seo-report.md"]
+    },
+    {
+      "id": "link-building",
+      "name": "Link Building",
+      "role": "Earns authoritative, relevant backlinks through prospecting and outreach.",
+      "definition": "link-building.md",
+      "reasoning": "standard",
+      "orchestrator": false,
+      "collaboratesWith": ["content-strategist", "reporting", "qa"],
+      "consumes": ["memory.md"],
+      "produces": ["prospect-list.md", "outreach-tracker"]
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting",
+      "role": "Packages the month's work into a client-safe Markdown + PDF report.",
+      "definition": "reporting.md",
+      "reasoning": "standard",
+      "orchestrator": false,
+      "collaboratesWith": [
+        "technical-seo",
+        "content-strategist",
+        "local-seo",
+        "link-building"
+      ],
+      "consumes": ["ga4.json", "search-console.json", "audit.json", "memory.md"],
+      "produces": ["report.md", "report.pdf"]
+    },
+    {
+      "id": "qa",
+      "name": "QA",
+      "role": "Verifies accuracy, completeness, and client-safety of every deliverable before it ships.",
+      "definition": "qa.md",
+      "reasoning": "high",
+      "orchestrator": false,
+      "collaboratesWith": [
+        "technical-seo",
+        "content-strategist",
+        "local-seo",
+        "link-building",
+        "reporting",
+        "developer-reviewer"
+      ],
+      "consumes": ["audit.json", "search-console.json", "ga4.json", "memory.md"],
+      "produces": ["qa-review.md"]
+    },
+    {
+      "id": "developer-reviewer",
+      "name": "Developer Reviewer",
+      "role": "Reviews the implementation of developer tasks against acceptance criteria.",
+      "definition": "developer-reviewer.md",
+      "reasoning": "high",
+      "orchestrator": false,
+      "collaboratesWith": ["technical-seo", "qa"],
+      "consumes": ["developer-tasks.md"],
+      "produces": ["dev-review.md"]
+    }
+  ]
+}
