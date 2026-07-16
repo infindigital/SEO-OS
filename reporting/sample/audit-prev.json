@@ -1,0 +1,13 @@
+{
+  "startUrl": "https://acme.com/",
+  "host": "acme.com",
+  "generatedAt": "2026-06-17T00:00:00Z",
+  "summary": {
+    "totalIssues": 15,
+    "totalTasks": 10,
+    "totalEstimatedMinutes": 358,
+    "estimatedTime": "5h 58m",
+    "byPriority": { "critical": 1, "high": 2, "medium": 5, "low": 2 }
+  },
+  "tasks": []
+}

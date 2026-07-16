@@ -1,0 +1,8 @@
+{
+  "property": "properties/123456789",
+  "range": { "startDate": "2026-05-21", "endDate": "2026-06-17" },
+  "generatedAt": "2026-06-18T05:00:00+00:00",
+  "totals": { "users": 7180, "sessions": 9650, "conversions": 291, "events": 46200 },
+  "topPages": [],
+  "events": []
+}

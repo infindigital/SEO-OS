@@ -57,6 +57,7 @@ yarn-error.log*
 /crawler/.venv/
 /searchconsole/.venv/
 /ga4/.venv/
+/reporting/.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -66,3 +67,5 @@ __pycache__/
 /developer-tasks.md
 /search-console.json
 /ga4.json
+/report.md
+/report.pdf

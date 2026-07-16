@@ -1,0 +1,16 @@
+{
+  "property": "properties/123456789",
+  "range": { "startDate": "2026-06-18", "endDate": "2026-07-15" },
+  "generatedAt": "2026-07-16T05:00:00+00:00",
+  "totals": { "users": 8421, "sessions": 11200, "conversions": 342, "events": 53100 },
+  "topPages": [
+    { "page": "/", "views": 9800, "users": 5400, "sessions": 6200 },
+    { "page": "/blog/seo-audit", "views": 4300, "users": 3100, "sessions": 3500 },
+    { "page": "/pricing", "views": 3100, "users": 2400, "sessions": 2600 }
+  ],
+  "events": [
+    { "event": "page_view", "count": 24800, "users": 8200 },
+    { "event": "session_start", "count": 11200, "users": 8100 },
+    { "event": "purchase", "count": 342, "users": 300 }
+  ]
+}

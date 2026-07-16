@@ -1,0 +1,12 @@
+{
+  "site": "https://acme.com/",
+  "range": { "startDate": "2026-05-21", "endDate": "2026-06-17" },
+  "generatedAt": "2026-06-18T05:00:00+00:00",
+  "totals": { "clicks": 3480, "impressions": 79100, "ctr": 0.044, "position": 12.6 },
+  "topQueries": [
+    { "query": "seo audit tool", "clicks": 360, "impressions": 5800, "ctr": 0.062, "position": 4.9 },
+    { "query": "technical seo checklist", "clicks": 268, "impressions": 5000, "ctr": 0.0536, "position": 6.8 },
+    { "query": "core web vitals fix", "clicks": 190, "impressions": 3600, "ctr": 0.0528, "position": 8.4 }
+  ],
+  "topPages": []
+}

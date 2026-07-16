@@ -1,0 +1,14 @@
+# Monthly report generator — dependencies for PDF export.
+#
+# The package, its tests, and Markdown export need no third-party packages
+# (standard library only). fpdf2 is required only for PDF export; it is pure
+# Python with no system dependencies and is imported lazily.
+#
+# Install into an isolated virtualenv:
+#   python -m venv reporting/.venv
+#   reporting/.venv/bin/pip install -r reporting/requirements.txt
+#
+# The Executive Summary uses Claude when ANTHROPIC_API_KEY is set; install the
+# optional SDK to enable it (a deterministic fallback runs otherwise):
+#   pip install anthropic
+fpdf2==2.8.1

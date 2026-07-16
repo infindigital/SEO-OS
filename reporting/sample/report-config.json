@@ -1,0 +1,24 @@
+{
+  "client": "Acme Corp",
+  "website": "https://acme.com/",
+  "period": "July 2026",
+  "seoScore": 78,
+  "seoScorePrevious": 71,
+  "ga4": "ga4.json",
+  "ga4Previous": "ga4-prev.json",
+  "searchConsole": "search-console.json",
+  "searchConsolePrevious": "search-console-prev.json",
+  "audit": "audit.json",
+  "auditPrevious": "audit-prev.json",
+  "openTasks": 4,
+  "completedWork": [
+    { "title": "Fixed 404 errors", "detail": "12 broken URLs redirected", "completedAt": "2026-07-08" },
+    { "title": "Added missing meta descriptions", "detail": "23 pages", "completedAt": "2026-07-11" },
+    { "title": "Compressed hero images", "detail": "LCP improved on key landing pages", "completedAt": "2026-07-14" }
+  ],
+  "roadmap": [
+    { "title": "Improve Core Web Vitals", "detail": "Target LCP under 2.5s on all templates" },
+    { "title": "Build topic cluster for 'technical SEO'", "detail": "5 supporting articles" },
+    { "title": "Implement Article schema", "detail": "Across the blog" }
+  ]
+}

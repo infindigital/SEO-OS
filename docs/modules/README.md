@@ -17,7 +17,7 @@ and where its code lives; the full specification is in
 | 09 | Technical SEO Audit | Implemented |
 | 10 | Content Planning | Planned |
 | 11 | AI Visibility | Planned |
-| 12 | Reporting | Partial |
+| 12 | Reporting | Implemented |
 | 13 | Automation | Partial |
 | 14 | Notifications | Planned |
 | 15 | GitHub Actions | Implemented |

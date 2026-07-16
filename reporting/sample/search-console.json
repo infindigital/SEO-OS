@@ -1,0 +1,16 @@
+{
+  "site": "https://acme.com/",
+  "range": { "startDate": "2026-06-18", "endDate": "2026-07-15" },
+  "generatedAt": "2026-07-16T05:00:00+00:00",
+  "totals": { "clicks": 4120, "impressions": 88400, "ctr": 0.0466, "position": 11.2 },
+  "topQueries": [
+    { "query": "seo audit tool", "clicks": 412, "impressions": 6100, "ctr": 0.0675, "position": 4.2 },
+    { "query": "technical seo checklist", "clicks": 305, "impressions": 5400, "ctr": 0.0565, "position": 6.1 },
+    { "query": "core web vitals fix", "clicks": 221, "impressions": 3900, "ctr": 0.0567, "position": 7.8 },
+    { "query": "schema markup guide", "clicks": 168, "impressions": 3100, "ctr": 0.0542, "position": 9.3 },
+    { "query": "crawl budget optimization", "clicks": 96, "impressions": 2400, "ctr": 0.04, "position": 11.5 }
+  ],
+  "topPages": [
+    { "page": "https://acme.com/blog/seo-audit", "clicks": 540, "impressions": 8200, "ctr": 0.0659, "position": 5.0 }
+  ]
+}
