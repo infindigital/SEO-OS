@@ -1,0 +1,11 @@
+# Google Analytics 4 sync — dependencies for LIVE runs only.
+#
+# The package, its tests, and offline `--sample` runs need no third-party
+# packages (standard library only). These are required solely for pulling real
+# data from the GA4 Data API with a service account.
+#
+# Install into an isolated virtualenv:
+#   python -m venv ga4/.venv
+#   ga4/.venv/bin/pip install -r ga4/requirements.txt
+google-auth==2.37.0
+requests==2.32.3

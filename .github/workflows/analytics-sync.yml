@@ -1,0 +1,79 @@
+name: Analytics Sync
+
+on:
+  schedule:
+    # Daily at 05:30 UTC (offset from the Search Console sync at 05:00).
+    - cron: "30 5 * * *"
+  workflow_dispatch:
+    inputs:
+      property:
+        description: "GA4 property id (e.g. 123456789)"
+        required: false
+        default: ""
+      days:
+        description: "Reporting window length in days"
+        required: false
+        default: "28"
+
+# Allow the job to commit the refreshed snapshot back to the repository.
+permissions:
+  contents: write
+
+concurrency:
+  group: analytics-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      # Property to sync: dispatch input wins, else the GA4_PROPERTY_ID variable.
+      GA4_PROPERTY_ID: ${{ github.event.inputs.property || vars.GA4_PROPERTY_ID }}
+      GA4_DAYS: ${{ github.event.inputs.days || '28' }}
+      # Service-account JSON key (a repository/organization secret). When empty,
+      # the job falls back to an offline --sample snapshot so it never fails hard.
+      GA4_CREDENTIALS_JSON: ${{ secrets.GA4_CREDENTIALS_JSON }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r ga4/requirements.txt
+
+      - name: Sync Google Analytics 4
+        run: |
+          set -euo pipefail
+          mkdir -p reports/ga4
+
+          property="${GA4_PROPERTY_ID:-123456789}"
+          out="reports/ga4/ga4.json"
+
+          if [ -n "${GA4_CREDENTIALS_JSON:-}" ] && [ -n "${GA4_PROPERTY_ID:-}" ]; then
+            printf '%s' "$GA4_CREDENTIALS_JSON" > "$RUNNER_TEMP/ga4-credentials.json"
+            python ga4/run_sync.py "$property" \
+              --credentials "$RUNNER_TEMP/ga4-credentials.json" \
+              --days "$GA4_DAYS" \
+              --out "$out"
+            rm -f "$RUNNER_TEMP/ga4-credentials.json"
+          else
+            echo "GA4_PROPERTY_ID/GA4_CREDENTIALS_JSON not configured — writing an offline sample snapshot."
+            python ga4/run_sync.py "$property" --sample --days "$GA4_DAYS" --out "$out"
+          fi
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "seo-os-bot"
+          git config user.email "bot@infindigital.net"
+          git add -f reports/ga4
+          if git diff --cached --quiet; then
+            echo "No GA4 changes to commit."
+          else
+            git commit -m "chore(ga4): sync $(date -u +%Y-%m-%d)"
+            git push
+          fi
