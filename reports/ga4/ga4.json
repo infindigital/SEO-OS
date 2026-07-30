@@ -1,10 +1,10 @@
 {
   "property": "properties/123456789",
   "range": {
-    "startDate": "2026-07-01",
-    "endDate": "2026-07-28"
+    "startDate": "2026-07-02",
+    "endDate": "2026-07-29"
   },
-  "generatedAt": "2026-07-29T08:04:26+00:00",
+  "generatedAt": "2026-07-30T07:54:32+00:00",
   "totals": {
     "users": 8421,
     "sessions": 11200,
