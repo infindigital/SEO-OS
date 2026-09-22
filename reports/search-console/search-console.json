@@ -1,10 +1,10 @@
 {
   "site": "https://example.com/",
   "range": {
-    "startDate": "2026-08-22",
-    "endDate": "2026-09-18"
+    "startDate": "2026-08-23",
+    "endDate": "2026-09-19"
   },
-  "generatedAt": "2026-09-21T10:23:18+00:00",
+  "generatedAt": "2026-09-22T09:37:08+00:00",
   "totals": {
     "clicks": 1820,
     "impressions": 45230,
